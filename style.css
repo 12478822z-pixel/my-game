@@ -1,5 +1,6 @@
 :root {
   color-scheme: dark;
+  font-size: 200%;
   --background: #141817;
   --surface: #1c2220;
   --surface-hover: #252d29;
@@ -75,7 +76,7 @@ h1 {
   margin: 22px 0 12px;
   font-family: Georgia, "Batang", serif;
   color: #f4d35e;
-  font-size: clamp(3.5rem, 10vw, 7.5rem);
+  font-size: clamp(3.5rem, 20vw, 7.5rem);
   font-weight: 400;
   line-height: 1.12;
   overflow-wrap: anywhere;
@@ -88,7 +89,7 @@ h1 {
 .tagline {
   margin: 0;
   color: #c1c8bf;
-  font-size: clamp(1.05rem, 2.5vw, 1.3rem);
+  font-size: clamp(2.1rem, 5vw, 2.6rem);
 }
 
 .favorites {
