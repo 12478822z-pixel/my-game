@@ -1,13 +1,13 @@
 :root {
-  color-scheme: dark;
-  --background: #172b46;
-  --surface: #1c2220;
-  --surface-hover: #252d29;
-  --text: #f1f2e9;
-  --muted: #a4ada4;
-  --line: #39423d;
-  --lime: #c8ef75;
-  --coral: #ff8d70;
+  color-scheme: light;
+  --background: #a8ddff;
+  --surface: #cceaff;
+  --surface-hover: #b8def5;
+  --text: #142b46;
+  --muted: #315a77;
+  --line: #6d9fbd;
+  --lime: #2d6a3c;
+  --coral: #a8432d;
 }
 
 * {
@@ -20,10 +20,10 @@ body {
   color: var(--text);
   background-color: var(--background);
   background-image:
-    linear-gradient(rgba(170, 205, 255, 0.035) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(170, 205, 255, 0.035) 1px, transparent 1px),
-    radial-gradient(ellipse at 15% 10%, rgba(100, 160, 255, 0.09), transparent 35%),
-    radial-gradient(ellipse at 90% 85%, rgba(90, 210, 230, 0.08), transparent 32%);
+    linear-gradient(rgba(255, 255, 255, 0.22) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.22) 1px, transparent 1px),
+    radial-gradient(ellipse at 15% 10%, rgba(255, 255, 255, 0.28), transparent 35%),
+    radial-gradient(ellipse at 90% 85%, rgba(41, 153, 208, 0.1), transparent 32%);
   background-size: 44px 44px, 44px 44px, auto, auto;
   font-family: "Malgun Gothic", "Apple SD Gothic Neo", sans-serif;
   line-height: 1.6;
@@ -63,18 +63,18 @@ button {
   height: 8px;
   border-radius: 50%;
   background: var(--lime);
-  box-shadow: 0 0 12px rgba(200, 239, 117, 0.55);
+  box-shadow: 0 0 12px rgba(45, 106, 60, 0.35);
 }
 
 .profile-number {
   margin-left: auto;
-  color: #727c74;
+  color: #486177;
 }
 
 h1 {
   margin: 22px 0 12px;
   font-family: Georgia, "Batang", serif;
-  color: #f4d35e;
+  color: var(--text);
   font-size: clamp(3.5rem, 10vw, 7.5rem);
   font-weight: 400;
   line-height: 1.12;
@@ -82,12 +82,12 @@ h1 {
 }
 
 .title-mark {
-  color: #f4d35e;
+  color: var(--text);
 }
 
 .tagline {
   margin: 0;
-  color: #c1c8bf;
+  color: var(--muted);
   font-size: clamp(1.05rem, 2.5vw, 1.3rem);
 }
 
@@ -264,7 +264,7 @@ h2 {
 
 .concept-list dd {
   margin: 0;
-  color: #c1c8bf;
+  color: var(--muted);
 }
 
 .page-footer {
