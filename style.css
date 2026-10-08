@@ -1,6 +1,6 @@
 :root {
   color-scheme: light;
-  --background: #a8ddff;
+  --background: #000000;
   --surface: #cceaff;
   --surface-hover: #b8def5;
   --text: #142b46;
@@ -19,12 +19,6 @@ body {
   margin: 0;
   color: var(--text);
   background-color: var(--background);
-  background-image:
-    linear-gradient(rgba(255, 255, 255, 0.22) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.22) 1px, transparent 1px),
-    radial-gradient(ellipse at 15% 10%, rgba(255, 255, 255, 0.28), transparent 35%),
-    radial-gradient(ellipse at 90% 85%, rgba(41, 153, 208, 0.1), transparent 32%);
-  background-size: 44px 44px, 44px 44px, auto, auto;
   font-family: "Malgun Gothic", "Apple SD Gothic Neo", sans-serif;
   line-height: 1.6;
 }
