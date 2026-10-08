@@ -1,13 +1,13 @@
 :root {
   color-scheme: light;
-  --background: #000000;
+  --background: #222222;
   --surface: #cceaff;
   --surface-hover: #b8def5;
-  --text: #142b46;
-  --muted: #315a77;
+  --text: #f4f7fa;
+  --muted: #c2ccd5;
   --line: #6d9fbd;
-  --lime: #2d6a3c;
-  --coral: #a8432d;
+  --lime: #baff6b;
+  --coral: #ff9c7a;
 }
 
 * {
@@ -57,12 +57,12 @@ button {
   height: 8px;
   border-radius: 50%;
   background: var(--lime);
-  box-shadow: 0 0 12px rgba(45, 106, 60, 0.35);
+  box-shadow: 0 0 12px rgba(186, 255, 107, 0.45);
 }
 
 .profile-number {
   margin-left: auto;
-  color: #486177;
+  color: var(--muted);
 }
 
 h1 {
@@ -138,6 +138,7 @@ h2 {
 .game-choice:focus-visible {
   padding-left: 16px;
   background: var(--surface-hover);
+  color: #142b46;
   outline: none;
 }
 
@@ -169,10 +170,11 @@ h2 {
 
 .game-choice[aria-pressed="true"] {
   background: var(--surface);
+  color: #142b46;
 }
 
 .game-choice[aria-pressed="true"] .game-action {
-  color: var(--lime);
+  color: #2d6a3c;
 }
 
 .selection-note {
@@ -211,7 +213,7 @@ h2 {
   padding: 14px 16px;
   border: 1px solid var(--line);
   border-radius: 4px;
-  color: var(--text);
+  color: #142b46;
   background: var(--surface);
   font: inherit;
   line-height: 1.6;
@@ -219,7 +221,7 @@ h2 {
 }
 
 #game-idea::placeholder {
-  color: var(--muted);
+  color: #315a77;
 }
 
 #game-idea:focus-visible {
