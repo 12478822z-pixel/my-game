@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#141817">
+  <title>나를 소개합니다</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="script.js" defer></script>
+</head>
+<body>
+  <main class="page-shell">
+    <header class="intro">
+      <p class="eyebrow"><span class="status-dot" aria-hidden="true"></span> PLAYER PROFILE <span class="profile-number">NO. 001</span></p>
+      <h1>박채린<span class="title-mark" aria-hidden="true">.</span></h1>
+      <p class="tagline">(게임콘텐츠학과 ２４학번 그래픽 전공)</p>
+    </header>
+
+    <section class="favorites" aria-labelledby="favorites-title">
+      <div class="section-heading">
+        <p class="eyebrow">OFF THE CLOCK</p>
+        <h2 id="favorites-title">좋아하는 게임</h2>
+      </div>
+      <ul class="game-list">
+        <li>
+          <button class="game-choice" type="button" aria-pressed="false">
+            <span class="game-index">01</span>
+            <span class="game-name">테일즈런너</span>
+            <span class="game-action">선택</span>
+          </button>
+        </li>
+        <li>
+          <button class="game-choice" type="button" aria-pressed="false">
+            <span class="game-index">02</span>
+            <span class="game-name">스타듀밸리</span>
+            <span class="game-action">선택</span>
+          </button>
+        </li>
+        <li>
+          <button class="game-choice" type="button" aria-pressed="false">
+            <span class="game-index">03</span>
+            <span class="game-name">루미큐브</span>
+            <span class="game-action">선택</span>
+          </button>
+        </li>
+      </ul>
+      <p class="selection-note" aria-live="polite">마음에 드는 게임을 골라 보세요.</p>
+    </section>
+    <section class="idea-section" aria-labelledby="idea-title">
+      <h2 id="idea-title">만든 게임 아이디어</h2>
+      <label class="visually-hidden" for="game-idea">게임 아이디어 입력</label>
+      <textarea id="game-idea" name="game-idea" rows="12">(후보1) 제목: 점심 쟁취&#10;한 줄 설명: 만석 편의점에서 밥을 성공적으로 먹는 게임&#10;플레이어가 하는 일: 빈자리를 찾아 자리를 차지하고 사람을 피해 빵을 구매해 먹는다&#10;게임이 끝나는 조건: 점심시간 내에 성공적으로 식사에 성공하면 클리어&#10;(후보2) 제목: 결석 탈출&#10;한 줄 설명: 만석 버스에서 사람으로 테트리스하기&#10;플레이어가 하는 일: 계속 들어오는 사람 모양에 맞춰 자리를 이동하기&#10;게임이 끝나는 조건: 목적지까지 밀려나지 않고 도착하면 성공&#10;(후보3) 제목: 진도 따라잡기&#10;한 줄 설명: 전공 교수님께 들키지 않고 모르는 내용을 타임어택으로 맞춘다&#10;플레이어가 하는 일: 선택지를 선택해 제한시간 내로 맞는 내용을 고르자&#10;게임이 끝나는 조건: 지나다니는 교수님께 틀린 것을 발각당하면 탈락</textarea>
+    </section>
+    <footer class="page-footer">
+      <time id="today-date"></time>
+    </footer>
+  </main>
+</body>
+</html>
