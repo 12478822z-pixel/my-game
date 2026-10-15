@@ -62,6 +62,23 @@ const layout = {
 		gap: 8, // 방향키 칸 사이 간격
 		count: 10, // 한 줄에 표시할 방향키 개수
 	},
+	lives: {
+		labelX: 32, // 목숨 안내 글자의 x 좌표
+		labelY: 24, // 목숨 안내 글자의 y 좌표
+		circleStartX: 112, // 첫 번째 빨간 원의 x 좌표
+		circleY: 24, // 빨간 원들의 y 좌표
+		circleRadius: 7, // 목숨 원의 반지름
+		circleGap: 12, // 목숨 원 사이 간격
+		count: 3, // 시작 목숨 개수
+	},
+	timer: {
+		x: 620, // 시간 바의 왼쪽 위 x 좌표
+		y: 16, // 시간 바의 왼쪽 위 y 좌표
+		width: 150, // 시간 바의 전체 너비
+		height: 16, // 시간 바의 높이
+		maxSeconds: 30, // 가득 찬 상태에서 남은 시간(초)
+		refillSeconds: 0.5, // 방향키를 맞혔을 때 늘어나는 시간(초)
+	},
 };
 
 // 장면 요소에 사용할 색을 한곳에서 관리합니다.
@@ -87,6 +104,11 @@ const colors = {
 	keyCurrent: "#f2b84b", // 지금 입력해야 하는 방향키 칸의 색
 	keyComplete: "#3d9b70", // 입력을 완료한 방향키 칸의 색
 	keyText: "#ffffff", // 방향키 기호 색
+	life: "#e33d3d", // 남은 목숨을 나타내는 빨간 원의 색
+	timerTrack: "#d7dce0", // 시간 바가 줄어든 자리에 보이는 색
+	timerFill: "#42a477", // 남은 시간을 나타내는 바의 색
+	timerLow: "#e33d3d", // 시간이 얼마 남지 않았을 때 바의 색
+	timerOutline: "#303840", // 시간 바의 테두리 색
 };
 
 // 게임에서 사용할 네 방향과 화면에 표시할 화살표 기호를 정합니다.
@@ -111,6 +133,8 @@ let arrowProgress = 0; // 지금까지 맞게 입력한 방향키 수
 let obstacleX = layout.obstacle.x; // 매 프레임 바뀌는 장애물의 x 좌표
 let obstacleDirection = 1; // 1은 오른쪽, -1은 왼쪽 이동을 뜻합니다.
 let previousFrameTime = 0; // 프레임 간 이동 시간을 계산할 기준 시각
+let remainingLives = layout.lives.count; // 현재 남은 목숨 개수
+let remainingTime = layout.timer.maxSeconds; // 현재 남은 제한 시간(초)
 
 // 한 프레임의 전체 화면을 그립니다.
 function drawScene() {
@@ -153,6 +177,30 @@ ctx.font = "bold 24px sans-serif";
 ctx.textAlign = "left";
 ctx.textBaseline = "top";
 ctx.fillText("진도 따라잡기", layout.title.x, layout.title.y);
+
+	// 왼쪽 위에 목숨 안내와 남은 목숨 수만큼의 빨간 원을 그립니다.
+	ctx.fillStyle = colors.title;
+	ctx.font = "12px sans-serif";
+	ctx.textAlign = "left";
+	ctx.textBaseline = "middle";
+	ctx.fillText("남은 목숨:", layout.lives.labelX, layout.lives.labelY);
+	ctx.fillStyle = colors.life;
+	for (let lifeIndex = 0; lifeIndex < remainingLives; lifeIndex += 1) {
+		const circleX = layout.lives.circleStartX + lifeIndex * layout.lives.circleGap;
+		ctx.beginPath();
+		ctx.arc(circleX, layout.lives.circleY, layout.lives.circleRadius, 0, Math.PI * 2);
+		ctx.fill();
+	}
+
+	// 오른쪽 위에 남은 시간 비율만큼 채워지는 사각형 시간 바를 그립니다.
+	const timerRatio = remainingTime / layout.timer.maxSeconds;
+	ctx.fillStyle = colors.timerTrack;
+	ctx.fillRect(layout.timer.x, layout.timer.y, layout.timer.width, layout.timer.height);
+	ctx.fillStyle = timerRatio <= 0.2 ? colors.timerLow : colors.timerFill;
+	ctx.fillRect(layout.timer.x, layout.timer.y, layout.timer.width * timerRatio, layout.timer.height);
+	ctx.strokeStyle = colors.timerOutline;
+	ctx.lineWidth = 1;
+	ctx.strokeRect(layout.timer.x, layout.timer.y, layout.timer.width, layout.timer.height);
 
 // 책상 다리를 사선으로 그려 바닥 쪽으로 깊어지는 느낌을 줍니다.
 layout.desk.legs.forEach((leg) => {
@@ -300,6 +348,7 @@ function animate(frameTime) {
 		: Math.min((frameTime - previousFrameTime) / 1000, 0.05);
 	previousFrameTime = frameTime;
 	obstacleX += layout.obstacle.speed * obstacleDirection * deltaSeconds;
+	remainingTime = Math.max(0, remainingTime - deltaSeconds);
 	if (obstacleX <= layout.obstacle.minX) {
 		obstacleX = layout.obstacle.minX;
 		obstacleDirection = 1;
@@ -318,6 +367,10 @@ window.addEventListener("keydown", (event) => {
 	event.preventDefault(); // 방향키 입력으로 페이지가 스크롤되는 것을 막습니다.
 	if (pressedArrow.key === arrowSequence[arrowProgress].key) {
 		arrowProgress += 1;
+		remainingTime = Math.min(
+			layout.timer.maxSeconds,
+			remainingTime + layout.timer.refillSeconds,
+		);
 		if (arrowProgress === arrowSequence.length) {
 			arrowSequence = createArrowSequence();
 			arrowProgress = 0;
