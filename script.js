@@ -15,15 +15,15 @@ const layout = {
 	},
 	title: { x: 32, y: 44 }, // 게임 제목을 표시할 위치
 	desk: {
-		backLeftX: 50, // 상판 뒤쪽 왼쪽 x 좌표
-		backRightX: 750, // 상판 뒤쪽 오른쪽 x 좌표
-		frontLeftX: 12, // 상판 앞쪽 왼쪽 x 좌표
-		frontRightX: 788, // 상판 앞쪽 오른쪽 x 좌표
-		backY: 314, // 상판 뒤쪽 y 좌표
-		frontY: 372, // 상판 앞쪽 y 좌표
-		frontDepth: 16, // 상판 앞면의 깊이
-		legBottomY: 540, // 책상 다리 아래쪽 y 좌표
-		legWidth: 16, // 책상 다리 너비
+		backLeftX: 30, // 상판 뒤쪽 왼쪽 x 좌표
+		backRightX: 770, // 상판 뒤쪽 오른쪽 x 좌표
+		frontLeftX: 0, // 상판 앞쪽 왼쪽 x 좌표
+		frontRightX: 800, // 상판 앞쪽 오른쪽 x 좌표
+		backY: 300, // 상판 뒤쪽 y 좌표
+		frontY: 408, // 상판 앞쪽 y 좌표
+		frontDepth: 20, // 상판 앞면의 깊이
+		legBottomY: 550, // 책상 다리 아래쪽 y 좌표
+		legWidth: 20, // 책상 다리 너비
 		legs: [
 			{ topX: 58, bottomX: 68 }, // 왼쪽 책상 다리의 기울어진 위치
 			{ topX: 726, bottomX: 716 }, // 오른쪽 책상 다리의 기울어진 위치
@@ -37,17 +37,31 @@ const layout = {
 		topDepth: 8, // 위에서 보이는 모니터 윗면의 깊이
 		perspectiveInset: 4, // 모니터 윗면과 앞면의 사선 정도
 		screenInset: 6, // 모니터 테두리 안쪽 여백
-		screenHeight: 48, // 화면 높이
+		screenHeight: 40, // 화면 높이
 		standWidth: 18, // 모니터 받침대 너비
-		standHeight: 24, // 모니터 받침대 높이
+		standHeight: 20, // 모니터 받침대 높이
 		baseWidth: 38, // 받침대 바닥 너비
 		baseHeight: 8, // 받침대 바닥 높이
 		keyboardWidth: 60, // 키보드 너비
-		keyboardHeight: 7, // 키보드 높이
-		keyboardY: 338, // 키보드 위쪽 y 좌표
+		keyboardHeight: 20, // 키보드 높이
+		keyboardY: 320, // 키보드 위쪽 y 좌표
 	},
 	player: { x: 384, y: 445, width: 32, height: 32 }, // 가운데 컴퓨터 앞 플레이어
-	obstacle: { x: 110, y: 500, size: 64 }, // 좌우 이동을 추가할 장애물의 시작 위치와 크기
+	obstacle: {
+		x: 130, // 장애물의 시작 x 좌표
+		y: 500, // 장애물의 y 좌표
+		size: 64, // 장애물 한 변의 길이
+		minX: 24, // 장애물이 왼쪽으로 이동할 수 있는 끝 위치
+		maxX: 712, // 장애물이 오른쪽으로 이동할 수 있는 끝 위치
+		speed: 190, // 장애물의 초당 이동 거리
+	},
+	arrowKeys: {
+		centerX: 400, // 방향키 줄의 가로 중앙 위치
+		y: 108, // 방향키 줄의 위쪽 y 좌표
+		size: 42, // 방향키 한 칸의 너비와 높이
+		gap: 8, // 방향키 칸 사이 간격
+		count: 10, // 한 줄에 표시할 방향키 개수
+	},
 };
 
 // 장면 요소에 사용할 색을 한곳에서 관리합니다.
@@ -69,9 +83,40 @@ const colors = {
 	playerOutline: "#535d66", // 플레이어가 배경과 구분되도록 하는 테두리색
 	obstacle: "#2589e8", // 파란 장애물 색
 	title: "#20252a", // 제목 글자색
+	key: "#252c33", // 아직 입력하지 않은 방향키 칸의 색
+	keyCurrent: "#f2b84b", // 지금 입력해야 하는 방향키 칸의 색
+	keyComplete: "#3d9b70", // 입력을 완료한 방향키 칸의 색
+	keyText: "#ffffff", // 방향키 기호 색
 };
 
-// 흰 벽과 바닥을 그려 강의실의 배경을 만듭니다.
+// 게임에서 사용할 네 방향과 화면에 표시할 화살표 기호를 정합니다.
+const arrowOptions = [
+	{ key: "ArrowUp", symbol: "↑" },
+	{ key: "ArrowDown", symbol: "↓" },
+	{ key: "ArrowLeft", symbol: "←" },
+	{ key: "ArrowRight", symbol: "→" },
+];
+
+// 방향키 칸 수만큼 무작위 방향을 골라 새 순서를 만듭니다.
+function createArrowSequence() {
+	return Array.from({ length: layout.arrowKeys.count }, () => {
+		const randomIndex = Math.floor(Math.random() * arrowOptions.length);
+		return arrowOptions[randomIndex];
+	});
+}
+
+// 현재 게임 진행 상태를 저장합니다.
+let arrowSequence = createArrowSequence(); // 무작위로 뽑힌 방향키 순서
+let arrowProgress = 0; // 지금까지 맞게 입력한 방향키 수
+let obstacleX = layout.obstacle.x; // 매 프레임 바뀌는 장애물의 x 좌표
+let obstacleDirection = 1; // 1은 오른쪽, -1은 왼쪽 이동을 뜻합니다.
+let previousFrameTime = 0; // 프레임 간 이동 시간을 계산할 기준 시각
+
+// 한 프레임의 전체 화면을 그립니다.
+function drawScene() {
+	ctx.clearRect(0, 0, game.width, game.height); // 이전 프레임 그림을 지웁니다.
+
+	// 흰 벽과 바닥을 그려 강의실의 배경을 만듭니다.
 ctx.fillStyle = colors.wall;
 ctx.fillRect(layout.wall.x, layout.wall.y, layout.wall.width, layout.wall.height);
 ctx.fillStyle = colors.floor;
@@ -105,6 +150,7 @@ layout.floor.seamFractions.forEach((fraction) => {
 // 벽 위에 게임 제목을 표시합니다.
 ctx.fillStyle = colors.title;
 ctx.font = "bold 24px sans-serif";
+ctx.textAlign = "left";
 ctx.textBaseline = "top";
 ctx.fillText("진도 따라잡기", layout.title.x, layout.title.y);
 
@@ -211,6 +257,74 @@ ctx.strokeStyle = colors.playerOutline;
 ctx.lineWidth = 2;
 ctx.strokeRect(layout.player.x, layout.player.y, layout.player.width, layout.player.height);
 
-// 왼쪽에서 오른쪽으로 무작위 이동할 파란색 장애물을 정지 상태로 그립니다.
+// 현재 x 좌표의 파란 장애물을 그리고, 좌우 이동 좌표는 animate 함수가 갱신합니다.
 ctx.fillStyle = colors.obstacle;
-ctx.fillRect(layout.obstacle.x, layout.obstacle.y, layout.obstacle.size, layout.obstacle.size);
+ctx.fillRect(obstacleX, layout.obstacle.y, layout.obstacle.size, layout.obstacle.size);
+
+// 무작위 방향 순서를 화면 가운데에 키 모양 칸으로 표시합니다.
+const arrowRowWidth = layout.arrowKeys.count * layout.arrowKeys.size
+	+ (layout.arrowKeys.count - 1) * layout.arrowKeys.gap;
+const arrowStartX = layout.arrowKeys.centerX - arrowRowWidth / 2;
+arrowSequence.forEach((arrow, index) => {
+	const keyX = arrowStartX + index * (layout.arrowKeys.size + layout.arrowKeys.gap);
+	const isComplete = index < arrowProgress;
+	const isCurrent = index === arrowProgress;
+	ctx.fillStyle = isComplete
+		? colors.keyComplete
+		: isCurrent
+			? colors.keyCurrent
+			: colors.key;
+	ctx.fillRect(keyX, layout.arrowKeys.y, layout.arrowKeys.size, layout.arrowKeys.size);
+	ctx.strokeStyle = colors.keyText;
+	ctx.lineWidth = 1;
+	ctx.strokeRect(keyX, layout.arrowKeys.y, layout.arrowKeys.size, layout.arrowKeys.size);
+	ctx.fillStyle = colors.keyText;
+	ctx.font = "bold 24px sans-serif";
+	ctx.textAlign = "center";
+	ctx.textBaseline = "middle";
+	ctx.fillText(arrow.symbol, keyX + layout.arrowKeys.size / 2, layout.arrowKeys.y + layout.arrowKeys.size / 2);
+});
+
+// 방향키 입력 진행 상황을 숫자로 알려 줍니다.
+ctx.fillStyle = colors.title;
+ctx.font = "14px sans-serif";
+ctx.textAlign = "center";
+ctx.textBaseline = "top";
+ctx.fillText(`${arrowProgress} / ${layout.arrowKeys.count}`, layout.arrowKeys.centerX, layout.arrowKeys.y + layout.arrowKeys.size + 10);
+}
+
+// 장애물을 좌우로 움직이고 화면을 계속 다시 그립니다.
+function animate(frameTime) {
+	const deltaSeconds = previousFrameTime === 0
+		? 0
+		: Math.min((frameTime - previousFrameTime) / 1000, 0.05);
+	previousFrameTime = frameTime;
+	obstacleX += layout.obstacle.speed * obstacleDirection * deltaSeconds;
+	if (obstacleX <= layout.obstacle.minX) {
+		obstacleX = layout.obstacle.minX;
+		obstacleDirection = 1;
+	} else if (obstacleX >= layout.obstacle.maxX) {
+		obstacleX = layout.obstacle.maxX;
+		obstacleDirection = -1;
+	}
+	drawScene();
+	requestAnimationFrame(animate);
+}
+
+// 실제 키보드 방향키를 화면의 무작위 순서와 연결합니다.
+window.addEventListener("keydown", (event) => {
+	const pressedArrow = arrowOptions.find((arrow) => arrow.key === event.key);
+	if (!pressedArrow) return;
+	event.preventDefault(); // 방향키 입력으로 페이지가 스크롤되는 것을 막습니다.
+	if (pressedArrow.key === arrowSequence[arrowProgress].key) {
+		arrowProgress += 1;
+		if (arrowProgress === arrowSequence.length) {
+			arrowSequence = createArrowSequence();
+			arrowProgress = 0;
+		}
+		drawScene();
+	}
+});
+
+// 브라우저 애니메이션 프레임을 요청해 게임을 시작합니다.
+requestAnimationFrame(animate);
