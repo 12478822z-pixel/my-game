@@ -47,7 +47,7 @@ const layout = {
 		keyboardY: 338, // 키보드 위쪽 y 좌표
 	},
 	player: { x: 384, y: 445, width: 32, height: 32 }, // 가운데 컴퓨터 앞 플레이어
-	obstacle: { x: 110, y: 500, size: 32 }, // 좌우 이동을 추가할 장애물의 시작 위치와 크기
+	obstacle: { x: 110, y: 500, size: 64 }, // 좌우 이동을 추가할 장애물의 시작 위치와 크기
 };
 
 // 장면 요소에 사용할 색을 한곳에서 관리합니다.
@@ -65,7 +65,7 @@ const colors = {
 	computerTop: "#30363b", // 위에서 보이는 모니터 윗면의 색
 	screen: "#263d4b", // 모니터 화면의 어두운 청록색
 	keyboard: "#272b30", // 키보드의 색
-	player: "#ffffff", // 플레이어의 흰색
+	player: "#999999", // 플레이어의 회색
 	playerOutline: "#535d66", // 플레이어가 배경과 구분되도록 하는 테두리색
 	obstacle: "#2589e8", // 파란 장애물 색
 	title: "#20252a", // 제목 글자색
