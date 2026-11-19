@@ -56,6 +56,8 @@ const layout = {
 		x: 130, // 장애물의 시작 x 좌표
 		y: 500, // 플레이어와 밑변을 맞춰 뒤에 보이게 하는 y 좌표
 		size: 64, // 장애물 한 변의 길이
+		visualScale: 3, // 장애물 그림을 충돌 범위의 세 배 크기로 표시하는 배율
+		shoulderCutY: 36, // 상반신을 자르는 어깨 위치
 		minX: 24, // 장애물이 왼쪽으로 이동할 수 있는 끝 위치
 		maxX: 712, // 장애물이 오른쪽으로 이동할 수 있는 끝 위치
 		speed: 190, // 장애물의 초당 이동 거리
@@ -65,7 +67,7 @@ const layout = {
 		stopDrainMultiplier: 4, // 멈춰 있는 동안 타이머가 줄어드는 배율
 	},
 	camera: {
-		stopZoomScale: 1.14, // 장애물이 멈췄을 때 게임 장면을 확대할 배율
+		stopZoomScale: 1.35, // 장애물이 멈췄을 때 게임 장면을 확대할 배율
 	},
 	gameOver: {
 		fontSize: 56, // Game Over 글자의 크기
@@ -118,7 +120,10 @@ const colors = {
 	keyboard: "#272b30", // 키보드의 색
 	player: "#999999", // 플레이어의 회색
 	playerOutline: "#535d66", // 플레이어가 배경과 구분되도록 하는 테두리색
-	obstacle: "#2589e8", // 파란 장애물 색
+	obstacle: "#17191d", // 인물 옷의 검은색
+	obstacleHighlight: "#41464d", // 검은 옷의 밝은 주름선
+	obstacleSkin: "#e5ad83", // 목과 귀의 피부색
+	obstacleHair: "#49352e", // 뒷머리 색
 	title: "#20252a", // 제목 글자색
 	key: "#252c33", // 아직 입력하지 않은 방향키 칸의 색
 	keyCurrent: "#f2b84b", // 지금 입력해야 하는 방향키 칸의 색
@@ -165,6 +170,60 @@ let isGameOver = false; // 목숨을 모두 잃었는지 저장합니다.
 let survivalTime = 0; // 게임을 시작한 뒤 흐른 생존 시간(초)
 let isClear = false; // 생존 목표를 달성했는지 저장합니다.
 
+// 장애물을 사람의 뒷모습 실루엣으로 그립니다.
+function drawObstaclePerson(x, y, size) {
+	const unit = size / 64;
+	const px = (value) => x + value * unit;
+	const py = (value) => y + value * unit;
+
+	// 옆으로 살짝 보이는 귀와 얼굴을 덮는 뒷머리
+	ctx.fillStyle = colors.obstacleSkin;
+	ctx.beginPath();
+	ctx.ellipse(px(23), py(14), 3 * unit, 4 * unit, 0, 0, Math.PI * 2);
+	ctx.ellipse(px(41), py(14), 3 * unit, 4 * unit, 0, 0, Math.PI * 2);
+	ctx.fill();
+
+	// 목을 먼저 그려 머리카락이 목 윗부분을 덮도록 합니다.
+	ctx.fillStyle = colors.obstacleSkin;
+	ctx.fillRect(px(28), py(19), 8 * unit, 6 * unit);
+
+	ctx.fillStyle = colors.obstacleHair;
+	ctx.beginPath();
+	ctx.moveTo(px(23), py(18));
+	ctx.lineTo(px(23), py(12));
+	ctx.quadraticCurveTo(px(22), py(2), px(32), py(2));
+	ctx.quadraticCurveTo(px(42), py(2), px(41), py(12));
+	ctx.lineTo(px(41), py(18));
+	ctx.lineTo(px(37), py(22));
+	ctx.lineTo(px(34), py(19));
+	ctx.lineTo(px(32), py(22));
+	ctx.lineTo(px(30), py(19));
+	ctx.lineTo(px(27), py(22));
+	ctx.closePath();
+	ctx.fill();
+
+	// 팔이 갈라져 보이지 않도록 쇄골 아래에서 잘린 어깨 실루엣
+	ctx.fillStyle = colors.obstacle;
+	ctx.beginPath();
+	ctx.moveTo(px(27), py(23));
+	ctx.lineTo(px(20), py(25));
+	ctx.quadraticCurveTo(px(12), py(28), px(9), py(layout.obstacle.shoulderCutY));
+	ctx.lineTo(px(55), py(layout.obstacle.shoulderCutY));
+	ctx.quadraticCurveTo(px(52), py(28), px(44), py(25));
+	ctx.lineTo(px(37), py(23));
+	ctx.closePath();
+	ctx.fill();
+
+	// 쇄골선을 간단히 표현해 팔과 상체가 나뉘어 보이지 않게 합니다.
+	ctx.strokeStyle = colors.obstacleHighlight;
+	ctx.lineWidth = Math.max(1, 1.5 * unit);
+	ctx.beginPath();
+	ctx.moveTo(px(27), py(27));
+	ctx.lineTo(px(32), py(31));
+	ctx.lineTo(px(37), py(27));
+	ctx.stroke();
+}
+
 // 한 프레임의 전체 화면을 그립니다.
 function drawScene() {
 	ctx.clearRect(0, 0, game.width, game.height); // 이전 프레임 그림을 지웁니다.
@@ -195,13 +254,33 @@ ctx.fillRect(layout.wall.x, layout.wall.y, layout.wall.width, layout.wall.height
 ctx.fillStyle = colors.floor;
 ctx.fillRect(layout.floor.x, layout.floor.y, layout.floor.width, layout.floor.height);
 
+const personSize = layout.obstacle.size * layout.obstacle.visualScale;
+const personInset = (personSize - layout.obstacle.size) / 2;
+const personX = obstacleX - personInset;
+const personY = game.height - personSize * layout.obstacle.shoulderCutY / 64;
+const personBounds = {
+	left: personX + personSize * 9 / 64,
+	right: personX + personSize * 55 / 64,
+	top: personY + personSize * 2 / 64,
+	bottom: personY + personSize * layout.obstacle.shoulderCutY / 64,
+};
+
 	// 장애물이 멈춘 동안 플레이어와 장애물을 중심으로 게임 장면만 확대합니다.
 	ctx.save();
 	const zoomScale = obstacleStopRemaining > 0 ? layout.camera.stopZoomScale : 1;
 	if (zoomScale > 1) {
 		const focusX = (obstacleX + layout.obstacle.size / 2 + layout.player.x + layout.player.width / 2) / 2;
-		const focusY = (layout.obstacle.y + layout.obstacle.size / 2 + layout.player.y + layout.player.height / 2) / 2;
-		ctx.translate(game.width / 2 - focusX * zoomScale, game.height / 2 - focusY * zoomScale);
+		const zoomMargin = 12;
+		const desiredX = game.width / 2 - focusX * zoomScale;
+		const desiredY = game.height - personBounds.bottom * zoomScale;
+		const minX = zoomMargin - personBounds.left * zoomScale;
+		const maxX = game.width - zoomMargin - personBounds.right * zoomScale;
+		const minY = zoomMargin - personBounds.top * zoomScale;
+		const maxY = game.height - personBounds.bottom * zoomScale;
+		ctx.translate(
+			Math.max(minX, Math.min(maxX, desiredX)),
+			Math.max(minY, Math.min(maxY, desiredY)),
+		);
 		ctx.scale(zoomScale, zoomScale);
 	}
 
@@ -330,9 +409,12 @@ layout.computers.xPositions.forEach((x) => {
 	);
 });
 
-// 회색 플레이어 뒤쪽 레이어에 현재 위치의 파란 장애물을 그립니다.
-ctx.fillStyle = colors.obstacle;
-ctx.fillRect(obstacleX, layout.obstacle.y, layout.obstacle.size, layout.obstacle.size);
+// 어깨 아래를 짧게 자른 사람 뒷모습을 충돌 범위보다 조금 크게 표시합니다.
+drawObstaclePerson(
+	personX,
+	personY,
+	personSize,
+);
 
 // 가운데 컴퓨터 앞에 테두리가 있는 회색 플레이어를 그립니다.
 ctx.fillStyle = colors.player;
