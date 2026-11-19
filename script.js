@@ -67,7 +67,7 @@ const layout = {
 		stopDrainMultiplier: 4, // 멈춰 있는 동안 타이머가 줄어드는 배율
 	},
 	camera: {
-		stopZoomScale: 1.35, // 장애물이 멈췄을 때 게임 장면을 확대할 배율
+		stopZoomScale: 1.5, // 장애물이 멈췄을 때 게임 장면을 확대할 배율
 	},
 	gameOver: {
 		fontSize: 56, // Game Over 글자의 크기
@@ -121,9 +121,9 @@ const colors = {
 	player: "#999999", // 플레이어의 회색
 	playerOutline: "#535d66", // 플레이어가 배경과 구분되도록 하는 테두리색
 	obstacle: "#17191d", // 인물 옷의 검은색
-	obstacleHighlight: "#41464d", // 검은 옷의 밝은 주름선
-	obstacleSkin: "#e5ad83", // 목과 귀의 피부색
-	obstacleHair: "#49352e", // 뒷머리 색
+	obstacleHighlight: "#000000", // 검은 옷의 밝은 주름선
+	obstacleSkin: "#e6c0a4", // 목과 귀의 피부색
+	obstacleHair: "#3d2b25", // 뒷머리 색
 	title: "#20252a", // 제목 글자색
 	key: "#252c33", // 아직 입력하지 않은 방향키 칸의 색
 	keyCurrent: "#f2b84b", // 지금 입력해야 하는 방향키 칸의 색
@@ -133,7 +133,7 @@ const colors = {
 	timerTrack: "#d7dce0", // 시간 바가 줄어든 자리에 보이는 색
 	timerFill: "#42a477", // 남은 시간을 나타내는 바의 색
 	timerLow: "#e33d3d", // 시간이 얼마 남지 않았을 때 바의 색
-	timerZoom: "#f2b84b", // 화면 확대 중 시간 바의 노란색
+	timerZoom: "#ffb223", // 화면 확대 중 시간 바의 노란색
 	timerOutline: "#303840", // 시간 바의 테두리 색
 	gameOverBackground: "#000000", // 게임 종료 화면의 검은 배경
 	gameOverText: "#ffffff", // 게임 종료 문구의 흰색
