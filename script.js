@@ -62,7 +62,7 @@ const layout = {
 		maxX: 712, // 장애물이 오른쪽으로 이동할 수 있는 끝 위치
 		speed: 190, // 장애물의 초당 이동 거리
 		stopGap: 12, // 플레이어와 멈춘 장애물 사이의 간격
-		stopChance: 0.35, // 플레이어 뒤에 도착했을 때 멈출 확률
+		stopChance: 0.45, // 플레이어 뒤에 도착했을 때 멈출 확률
 		stopDurationSeconds: 10, // 확률적으로 멈춰 있는 시간(초)
 		stopDrainMultiplier: 4, // 멈춰 있는 동안 타이머가 줄어드는 배율
 	},
