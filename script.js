@@ -597,6 +597,9 @@ function playKeyClick() {
 	if (!audioContext) {
 		audioContext = new AudioContext();
 	}
+	if (audioContext.state === "suspended") {
+		audioContext.resume();
+	}
 
 	const oscillator = audioContext.createOscillator();
 	const gain = audioContext.createGain();
@@ -605,7 +608,7 @@ function playKeyClick() {
 	oscillator.type = "square";
 	oscillator.frequency.setValueAtTime(1200, now);
 	oscillator.frequency.exponentialRampToValueAtTime(500, now + 0.025);
-	gain.gain.setValueAtTime(0.035, now);
+	gain.gain.setValueAtTime(0.06, now);
 	gain.gain.exponentialRampToValueAtTime(0.001, now + 0.025);
 	oscillator.connect(gain);
 	gain.connect(audioContext.destination);
@@ -634,6 +637,9 @@ window.addEventListener("keydown", (event) => {
 		}
 	} else {
 		remainingTime = Math.max(0, remainingTime - layout.timer.penaltySeconds);
+		game.classList.remove("shake");
+		void game.offsetWidth;
+		game.classList.add("shake");
 	}
 	drawScene();
 });

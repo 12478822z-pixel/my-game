@@ -318,6 +318,10 @@ h2 {
     scroll-behavior: auto !important;
     transition-duration: 0.01ms !important;
   }
+
+  #game.shake {
+    animation-duration: 200ms !important;
+  }
 }
 
 body {
@@ -332,4 +336,20 @@ body {
   width: min(800px, 100vw);
   height: auto;
   border: 1px solid #fff;
+}
+
+#game.shake {
+  animation: game-shake 200ms ease-in-out;
+}
+
+@keyframes game-shake {
+  0%, 100% {
+    transform: translateX(0);
+  }
+  25%, 75% {
+    transform: translateX(-5px);
+  }
+  50% {
+    transform: translateX(5px);
+  }
 }
