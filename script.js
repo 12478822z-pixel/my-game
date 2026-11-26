@@ -601,19 +601,44 @@ function playKeyClick() {
 		audioContext.resume();
 	}
 
-	const oscillator = audioContext.createOscillator();
-	const gain = audioContext.createGain();
 	const now = audioContext.currentTime;
+	const thockDuration = 0.09;
+	const noiseDuration = 0.035;
 
-	oscillator.type = "square";
-	oscillator.frequency.setValueAtTime(1200, now);
-	oscillator.frequency.exponentialRampToValueAtTime(500, now + 0.025);
-	gain.gain.setValueAtTime(0.06, now);
-	gain.gain.exponentialRampToValueAtTime(0.001, now + 0.025);
-	oscillator.connect(gain);
-	gain.connect(audioContext.destination);
-	oscillator.start(now);
-	oscillator.stop(now + 0.025);
+	const thock = audioContext.createOscillator();
+	const thockGain = audioContext.createGain();
+	thock.type = "triangle";
+	thock.frequency.setValueAtTime(150, now);
+	thock.frequency.exponentialRampToValueAtTime(70, now + thockDuration);
+	thockGain.gain.setValueAtTime(0.18, now);
+	thockGain.gain.exponentialRampToValueAtTime(0.001, now + thockDuration);
+	thock.connect(thockGain);
+	thockGain.connect(audioContext.destination);
+	thock.start(now);
+	thock.stop(now + thockDuration);
+
+	const noiseBuffer = audioContext.createBuffer(
+		1,
+		Math.ceil(audioContext.sampleRate * noiseDuration),
+		audioContext.sampleRate,
+	);
+	const noiseSamples = noiseBuffer.getChannelData(0);
+	for (let index = 0; index < noiseSamples.length; index += 1) {
+		noiseSamples[index] = Math.random() * 2 - 1;
+	}
+	const noise = audioContext.createBufferSource();
+	const noiseFilter = audioContext.createBiquadFilter();
+	const noiseGain = audioContext.createGain();
+	noise.buffer = noiseBuffer;
+	noiseFilter.type = "lowpass";
+	noiseFilter.frequency.setValueAtTime(1800, now);
+	noiseGain.gain.setValueAtTime(0.1, now);
+	noiseGain.gain.exponentialRampToValueAtTime(0.001, now + noiseDuration);
+	noise.connect(noiseFilter);
+	noiseFilter.connect(noiseGain);
+	noiseGain.connect(audioContext.destination);
+	noise.start(now);
+	noise.stop(now + noiseDuration);
 }
 
 function handleKeyInput(key) {

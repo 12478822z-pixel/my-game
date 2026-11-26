@@ -346,16 +346,17 @@ body {
 }
 
 .direction-pad {
+  --direction-button-size: clamp(48px, 14vw, 64px);
   position: absolute;
   z-index: 1;
   bottom: 12px;
   left: 12px;
   display: grid;
   grid-template:
-    ". up ." 64px
-    "left down right" 64px
-    / 64px 64px 64px;
-  gap: 6px;
+    ". up ." var(--direction-button-size)
+    "left down right" var(--direction-button-size)
+    / var(--direction-button-size) var(--direction-button-size) var(--direction-button-size);
+  gap: 4px;
   touch-action: manipulation;
   user-select: none;
 }
@@ -368,7 +369,7 @@ body {
   border-radius: 12px;
   color: #fff;
   background: #30363b;
-  font: bold 30px/1 sans-serif;
+  font: bold clamp(22px, 6vw, 30px)/1 sans-serif;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
 }
