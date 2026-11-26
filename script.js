@@ -108,7 +108,7 @@ const colors = {
 	wall: "#ffffff", // 벽의 흰색
 	floor: "#e5e8eb", // 바닥의 밝은 회색
 	floorLine: "#c6cbd0", // 벽과 바닥의 경계선
-	floorGrid: "#d3d8dc", // 원근감을 표현하는 바닥 타일선
+	floorGrid: "#adadad", // 원근감을 표현하는 바닥 타일선
 	desk: "#76533d", // 책상 상판의 나무색
 	deskFront: "#50392c", // 책상 앞면과 다리의 어두운 색
 	deskSide: "#624732", // 책상 옆면의 어두운 나무색
@@ -118,7 +118,7 @@ const colors = {
 	computerTop: "#30363b", // 위에서 보이는 모니터 윗면의 색
 	screen: "#263d4b", // 모니터 화면의 어두운 청록색
 	keyboard: "#272b30", // 키보드의 색
-	player: "#999999", // 플레이어의 회색
+	player: "#3a3a3a", // 플레이어의 회색
 	playerOutline: "#535d66", // 플레이어가 배경과 구분되도록 하는 테두리색
 	obstacle: "#17191d", // 인물 옷의 검은색
 	obstacleHighlight: "#000000", // 검은 옷의 밝은 주름선
@@ -312,6 +312,29 @@ layout.floor.seamFractions.forEach((fraction) => {
 	ctx.lineTo(rightX, y);
 	ctx.stroke();
 });
+
+// 책상 앞쪽에서 바닥으로 퍼지는 부드러운 그림자를 그립니다.
+const tableShadowGradient = ctx.createLinearGradient(
+	0,
+	layout.desk.frontY + layout.desk.frontDepth,
+	0,
+	layout.desk.legBottomY + 20,
+);
+tableShadowGradient.addColorStop(0, "rgba(35, 29, 24, 0.2)");
+tableShadowGradient.addColorStop(0.35, "rgba(35, 29, 24, 0.12)");
+tableShadowGradient.addColorStop(1, "rgba(35, 29, 24, 0)");
+ctx.save();
+ctx.fillStyle = tableShadowGradient;
+ctx.shadowColor = "rgba(35, 29, 24, 0.18)";
+ctx.shadowBlur = 18;
+ctx.beginPath();
+ctx.moveTo(layout.desk.frontLeftX, layout.desk.frontY + layout.desk.frontDepth);
+ctx.lineTo(layout.desk.frontRightX, layout.desk.frontY + layout.desk.frontDepth);
+ctx.lineTo(layout.desk.frontRightX, layout.desk.legBottomY + 20);
+ctx.lineTo(layout.desk.frontLeftX, layout.desk.legBottomY + 20);
+ctx.closePath();
+ctx.fill();
+ctx.restore();
 
 // 책상 다리를 사선으로 그려 바닥 쪽으로 깊어지는 느낌을 줍니다.
 layout.desk.legs.forEach((leg) => {
@@ -567,10 +590,34 @@ function animate(frameTime) {
 	requestAnimationFrame(animate);
 }
 
+let audioContext;
+
+// 키 입력마다 짧은 클릭음을 재생합니다.
+function playKeyClick() {
+	if (!audioContext) {
+		audioContext = new AudioContext();
+	}
+
+	const oscillator = audioContext.createOscillator();
+	const gain = audioContext.createGain();
+	const now = audioContext.currentTime;
+
+	oscillator.type = "square";
+	oscillator.frequency.setValueAtTime(1200, now);
+	oscillator.frequency.exponentialRampToValueAtTime(500, now + 0.025);
+	gain.gain.setValueAtTime(0.035, now);
+	gain.gain.exponentialRampToValueAtTime(0.001, now + 0.025);
+	oscillator.connect(gain);
+	gain.connect(audioContext.destination);
+	oscillator.start(now);
+	oscillator.stop(now + 0.025);
+}
+
 // 실제 키보드 방향키를 화면의 무작위 순서와 연결합니다.
 window.addEventListener("keydown", (event) => {
 	if (isGameOver || isClear) return; // 게임 종료 후에는 키 입력을 처리하지 않습니다.
 	if (event.repeat) return; // 키를 길게 눌러 반복 입력되어도 감점은 한 번만 합니다.
+	playKeyClick();
 	const pressedArrow = arrowOptions.find((arrow) => arrow.key === event.key);
 	if (pressedArrow) {
 		event.preventDefault(); // 방향키 입력으로 페이지가 스크롤되는 것을 막습니다.
