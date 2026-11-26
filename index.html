@@ -8,6 +8,14 @@
   <script src="script.js" defer></script>
 </head>
 <body>
-  <canvas id="game" width="800" height="600"></canvas>
+  <main id="game-container">
+    <canvas id="game" width="800" height="600"></canvas>
+    <div class="direction-pad" role="group" aria-label="게임 방향키">
+      <button class="direction-button direction-up" type="button" data-direction="ArrowUp" aria-label="위쪽">↑</button>
+      <button class="direction-button direction-left" type="button" data-direction="ArrowLeft" aria-label="왼쪽">←</button>
+      <button class="direction-button direction-down" type="button" data-direction="ArrowDown" aria-label="아래쪽">↓</button>
+      <button class="direction-button direction-right" type="button" data-direction="ArrowRight" aria-label="오른쪽">→</button>
+    </div>
+  </main>
 </body>
 </html>

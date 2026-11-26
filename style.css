@@ -331,11 +331,72 @@ body {
   background: #222;
 }
 
+#game-container {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  width: min(800px, 100vw);
+}
+
 #game {
   display: block;
   width: min(800px, 100vw);
   height: auto;
   border: 1px solid #fff;
+}
+
+.direction-pad {
+  position: absolute;
+  z-index: 1;
+  bottom: 12px;
+  left: 12px;
+  display: grid;
+  grid-template:
+    ". up ." 64px
+    "left down right" 64px
+    / 64px 64px 64px;
+  gap: 6px;
+  touch-action: manipulation;
+  user-select: none;
+}
+
+.direction-button {
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border: 2px solid #c6cbd0;
+  border-radius: 12px;
+  color: #fff;
+  background: #30363b;
+  font: bold 30px/1 sans-serif;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.direction-button:active {
+  border-color: #f2b84b;
+  background: #76533d;
+}
+
+.direction-button:focus-visible {
+  outline: 3px solid #f2b84b;
+  outline-offset: 2px;
+}
+
+.direction-up {
+  grid-area: up;
+}
+
+.direction-left {
+  grid-area: left;
+}
+
+.direction-down {
+  grid-area: down;
+}
+
+.direction-right {
+  grid-area: right;
 }
 
 #game.shake {

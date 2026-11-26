@@ -616,15 +616,10 @@ function playKeyClick() {
 	oscillator.stop(now + 0.025);
 }
 
-// 실제 키보드 방향키를 화면의 무작위 순서와 연결합니다.
-window.addEventListener("keydown", (event) => {
-	if (isGameOver || isClear) return; // 게임 종료 후에는 키 입력을 처리하지 않습니다.
-	if (event.repeat) return; // 키를 길게 눌러 반복 입력되어도 감점은 한 번만 합니다.
+function handleKeyInput(key) {
+	if (isGameOver || isClear) return;
 	playKeyClick();
-	const pressedArrow = arrowOptions.find((arrow) => arrow.key === event.key);
-	if (pressedArrow) {
-		event.preventDefault(); // 방향키 입력으로 페이지가 스크롤되는 것을 막습니다.
-	}
+	const pressedArrow = arrowOptions.find((arrow) => arrow.key === key);
 	if (pressedArrow && pressedArrow.key === arrowSequence[arrowProgress].key) {
 		arrowProgress += 1;
 		remainingTime = Math.min(
@@ -642,6 +637,23 @@ window.addEventListener("keydown", (event) => {
 		game.classList.add("shake");
 	}
 	drawScene();
+}
+
+// 실제 키보드 방향키를 화면의 무작위 순서와 연결합니다.
+window.addEventListener("keydown", (event) => {
+	if (isGameOver || isClear) return; // 게임 종료 후에는 키 입력을 처리하지 않습니다.
+	if (event.repeat) return; // 키를 길게 눌러 반복 입력되어도 감점은 한 번만 합니다.
+	if (arrowOptions.some((arrow) => arrow.key === event.key)) {
+		event.preventDefault(); // 방향키 입력으로 페이지가 스크롤되는 것을 막습니다.
+	}
+	handleKeyInput(event.key);
+});
+
+// 화면 방향키도 키보드 입력과 같은 게임 처리 함수를 사용합니다.
+document.querySelectorAll(".direction-button").forEach((button) => {
+	button.addEventListener("click", () => {
+		handleKeyInput(button.dataset.direction);
+	});
 });
 
 // 브라우저 애니메이션 프레임을 요청해 게임을 시작합니다.
