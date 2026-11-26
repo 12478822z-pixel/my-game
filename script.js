@@ -610,7 +610,7 @@ function updateFocusBgm(shouldPlay) {
 		filter.type = "lowpass";
 		filter.frequency.setValueAtTime(240, now);
 		focusHumGain.gain.setValueAtTime(0.0001, now);
-		focusHumGain.gain.exponentialRampToValueAtTime(0.018, now + 0.3);
+		focusHumGain.gain.exponentialRampToValueAtTime(0.025, now + 0.3);
 		focusHumOscillator.connect(filter);
 		filter.connect(focusHumGain);
 		focusHumGain.connect(audioContext.destination);
