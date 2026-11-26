@@ -578,6 +578,7 @@ function animate(frameTime) {
 	if (!isGameOver && remainingLives > 0 && survivalTime >= layout.clear.survivalSeconds) {
 		isClear = true; // 목숨이 남아 있는 채 생존 목표 시간에 도달하면 클리어합니다.
 	}
+	updateFocusBgm(obstacleStopRemaining > 0 && !isGameOver && !isClear);
 	if (isClear) {
 		drawScene();
 		return;
@@ -591,6 +592,40 @@ function animate(frameTime) {
 }
 
 let audioContext;
+let focusHumOscillator;
+let focusHumGain;
+let isFocusHumPlaying = false;
+
+function updateFocusBgm(shouldPlay) {
+	if (!audioContext || shouldPlay === isFocusHumPlaying) return;
+	isFocusHumPlaying = shouldPlay;
+
+	const now = audioContext.currentTime;
+	if (shouldPlay) {
+		focusHumOscillator = audioContext.createOscillator();
+		focusHumGain = audioContext.createGain();
+		const filter = audioContext.createBiquadFilter();
+		focusHumOscillator.type = "sawtooth";
+		focusHumOscillator.frequency.setValueAtTime(82, now);
+		filter.type = "lowpass";
+		filter.frequency.setValueAtTime(240, now);
+		focusHumGain.gain.setValueAtTime(0.0001, now);
+		focusHumGain.gain.exponentialRampToValueAtTime(0.018, now + 0.3);
+		focusHumOscillator.connect(filter);
+		filter.connect(focusHumGain);
+		focusHumGain.connect(audioContext.destination);
+		focusHumOscillator.start(now);
+		return;
+	}
+
+	const stopTime = now + 0.3;
+	focusHumGain.gain.cancelScheduledValues(now);
+	focusHumGain.gain.setValueAtTime(Math.max(focusHumGain.gain.value, 0.0001), now);
+	focusHumGain.gain.exponentialRampToValueAtTime(0.0001, stopTime);
+	focusHumOscillator.stop(stopTime);
+	focusHumOscillator = undefined;
+	focusHumGain = undefined;
+}
 
 // 키 입력마다 짧은 클릭음을 재생합니다.
 function playKeyClick() {
