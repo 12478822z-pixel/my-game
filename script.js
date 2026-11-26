@@ -639,6 +639,20 @@ function playKeyClick() {
 	noiseGain.connect(audioContext.destination);
 	noise.start(now);
 	noise.stop(now + noiseDuration);
+
+	const click = audioContext.createBufferSource();
+	const clickFilter = audioContext.createBiquadFilter();
+	const clickGain = audioContext.createGain();
+	click.buffer = noiseBuffer;
+	clickFilter.type = "highpass";
+	clickFilter.frequency.setValueAtTime(1800, now);
+	clickGain.gain.setValueAtTime(0.12, now);
+	clickGain.gain.exponentialRampToValueAtTime(0.001, now + 0.012);
+	click.connect(clickFilter);
+	clickFilter.connect(clickGain);
+	clickGain.connect(audioContext.destination);
+	click.start(now);
+	click.stop(now + 0.012);
 }
 
 function handleKeyInput(key) {
